@@ -35,6 +35,7 @@
         this.build_ui();
         this.set_date( this.$element.attr('value') );
         this.proxy_label_clicks();
+        this.isBlurring = false;
     };
 
     function str_right(str, n) { return str.substr(str.length - n); }
@@ -201,11 +202,8 @@
             this.wrapper.addClass('focus');
         }
 
-        ,focus_out: function() {
-            if(this.on_blur) {
-                var self = this;
-                setTimeout(function() { self.widget_focus_lost(); }, 2);
-            }
+        , focus_out: function () {
+            this.isBlurring = true;
             this.wrapper.removeClass('focus');
         }
 
@@ -332,8 +330,12 @@
                         var date_obj = this.get_date();
                         var date_str = this.format_date( date_obj );
                         this.$element.val( date_str );
-                        if(this.on_change) {
-                            this.on_change( date_str );
+                        if (this.on_change) {
+                            this.on_change(date_str);
+                            if (this.isBlurring === true && this.on_blur) {
+                                this.widget_focus_lost();
+                                this.isBlurring = false;
+                            }
                         }
                     }
                 }
